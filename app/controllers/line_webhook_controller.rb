@@ -4,6 +4,11 @@ class LineWebhookController < ApplicationController
   before_action :validate_signature
   
   def create
+    event = @line_client.parse_events_from(request.body)[0]
+    if event.message.text == 'ユーザー登録'
+      response = get_profile(event.source.userId)
+      User.create(name: response.displayName, line_user_id: response.userId)
+    end
     render status: 200, json: { status: 200, message: 'OK Ranch!'}
   end
 
@@ -15,6 +20,10 @@ class LineWebhookController < ApplicationController
         config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
         config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
       }
+    end
+
+    def get_profile(user_id)
+      @line_client.get_profile(user_id)
     end
     
     def validate_signature
