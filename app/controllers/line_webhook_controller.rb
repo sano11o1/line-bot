@@ -1,6 +1,5 @@
 class LineWebhookController < ApplicationController
   skip_before_action :verify_authenticity_token
-  before_action :set_line_client
   before_action :validate_signature
   
   def create
@@ -24,14 +23,6 @@ class LineWebhookController < ApplicationController
   end
 
   private
-
-    def set_line_client
-      @line_client = Line::Bot::Client.new { |config|
-        config.channel_id = ENV["LINE_CHANNEL_ID"]
-        config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
-        config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
-      }
-    end
 
     def get_profile(user_id)
       @line_client.get_profile(user_id)
